@@ -5,6 +5,9 @@
 #include <Adafruit_NeoPixel.h>
 #include "message.h"
 
+//VERSION 1.1
+String fwversion = "1.1";
+
 // Globális változók a fogadó oldalon
 int led1_r = 255;
 int led1_g = 0;
@@ -15,16 +18,16 @@ int led3_g = 0;
 int led4_r = 255;
 int led4_g = 0;
 
-int led_brightness = 255;  // 0–255
+int led_brightness = 200;  // 0–255
 bool leds_off = false;
-bool ledStateChanged = false;
+bool ledStateChanged = true;
 
 // LED pinek és darabszám
-#define NUM_LEDS 1  // minden LED csík 1 pixel
-#define LED1_PIN 1
+#define NUM_LEDS 37  // minden LED csík 1 pixel
+#define LED1_PIN 10
 #define LED2_PIN 2
 #define LED3_PIN 3
-#define LED4_PIN 10
+#define LED4_PIN 1
 
 // LED csíkok objektumai
 Adafruit_NeoPixel led1(NUM_LEDS, LED1_PIN, NEO_GRB + NEO_KHZ800);
@@ -41,10 +44,14 @@ typedef struct struct_message {
 struct_message incomingData;
 
 // Segédfüggvény LED szín állításra
-void setColor(Adafruit_NeoPixel &led, uint8_t r, uint8_t g, uint8_t b) {
-  led.setPixelColor(0, led.Color(r, g, b));
-  led.show();
+void setColor(Adafruit_NeoPixel &strip, uint8_t r, uint8_t g, uint8_t b) {
+  for (int i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, strip.Color(r, g, b));
+  }
+  strip.show();
 }
+
+
 
 //SendNOW(cimzett mac cim, üzenet);
 void SendNOW(const uint8_t *mac, const Message &msg) {
@@ -86,6 +93,7 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len) {
               led4_r = 255;
               led4_g = 0;
               ledStateChanged = true;  // jelezzük, hogy frissíteni kell
+              leds_off = false; // turn ON led
           break;
         }
     break;
